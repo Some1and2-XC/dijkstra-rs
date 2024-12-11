@@ -1,3 +1,4 @@
+use core::fmt;
 use std::sync::{RwLock, Arc};
 
 use node::*;
@@ -5,7 +6,6 @@ mod node;
 
 fn main() {
 
-    println!("Hello, world!");
     let mut nodes: Vec<Arc<RwLock<Node<i32>>>> = Vec::new();
 
     nodes.push(Arc::new(RwLock::new(Node::new(0))));
@@ -28,10 +28,15 @@ fn main() {
     add_conection(&mut nodes, 3, 5, 15.0);
     add_conection(&mut nodes, 5, 6, 6.0 );
 
+    println!("Node 6 Connections:");
+    for i in nodes[6].read().unwrap().connections.clone() {
+        println!(" -> {}", i);
+    }
+
 }
 
 /// Utility method for adding a connection to a node from the vec.
-pub fn add_conection<T>(nodes: &mut Vec<Arc<RwLock<Node<T>>>>, idx_1: usize, idx_2: usize, distance: f64) -> Option<()> {
+pub fn add_conection<T: fmt::Display>(nodes: &mut Vec<Arc<RwLock<Node<T>>>>, idx_1: usize, idx_2: usize, distance: f64) -> Option<()> {
     // Adds the connection to idx_1
     {
         let tmp_ptr = nodes.get_mut(idx_1)?.clone();
