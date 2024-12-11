@@ -8,25 +8,25 @@ fn main() {
     println!("Hello, world!");
     let mut nodes: Vec<Arc<RwLock<Node<i32>>>> = Vec::new();
 
-    nodes.push(Arc::new(RwLock::new(Node::new(2))));
-    nodes.push(Arc::new(RwLock::new(Node::new(4))));
     nodes.push(Arc::new(RwLock::new(Node::new(0))));
-    nodes.push(Arc::new(RwLock::new(Node::new(3))));
-    nodes.push(Arc::new(RwLock::new(Node::new(6))));
     nodes.push(Arc::new(RwLock::new(Node::new(1))));
+    nodes.push(Arc::new(RwLock::new(Node::new(2))));
+    nodes.push(Arc::new(RwLock::new(Node::new(3))));
+    nodes.push(Arc::new(RwLock::new(Node::new(4))));
     nodes.push(Arc::new(RwLock::new(Node::new(5))));
+    nodes.push(Arc::new(RwLock::new(Node::new(6))));
 
     // Top connections
-    add_conection(&mut nodes, 3, 0, 6.0);
-    add_conection(&mut nodes, 0, 4, 8.0);
-    add_conection(&mut nodes, 4, 2, 10.0);
-    add_conection(&mut nodes, 2, 5, 2.0);
+    add_conection(&mut nodes, 0, 2, 6.0 );
+    add_conection(&mut nodes, 2, 3, 8.0 );
+    add_conection(&mut nodes, 3, 4, 10.0);
+    add_conection(&mut nodes, 4, 6, 2.0 );
 
     // Bottom connections
-    add_conection(&mut nodes, 3, 6, 2.0);
-    add_conection(&mut nodes, 6, 4, 5.0);
-    add_conection(&mut nodes, 4, 7, 15.0);
-    add_conection(&mut nodes, 7, 5, 6.0);
+    add_conection(&mut nodes, 0, 1, 2.0 );
+    add_conection(&mut nodes, 1, 3, 5.0 );
+    add_conection(&mut nodes, 3, 5, 15.0);
+    add_conection(&mut nodes, 5, 6, 6.0 );
 
 }
 
