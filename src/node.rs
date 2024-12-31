@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{fmt::Display, sync::{Arc, RwLock}};
+use std::{fmt::Display, sync::{Arc, RwLock, Weak}};
 
 #[derive(Clone)]
 pub struct Node<T> {
@@ -9,7 +9,7 @@ pub struct Node<T> {
 
 #[derive(Clone)]
 pub struct Connection<T> {
-    pub destination: Arc<RwLock<Node<T>>>,
+    pub destination: Weak<RwLock<Node<T>>>,
     pub distance: f64,
 }
 
@@ -46,7 +46,7 @@ impl<T> Connection<T> {
     /// Function for creating a new node connection.
     pub fn new(destination: Arc<RwLock<Node<T>>>, distance: f64) -> Self {
         return Self {
-            destination,
+            destination: Arc::downgrade(&destination),
             distance,
         };
     }
@@ -56,15 +56,33 @@ impl<T> Connection<T> {
 impl<T: Copy> Connection<T> {
 
     /// Function for getting the reference value from a connection.
+    /// Panics if the inner value to the connection has been droped (we only have a weak pointer).
     pub fn get_value(&self) -> T {
-        return self.destination.read().unwrap().value.clone();
+        return self.destination
+            .upgrade()
+            .expect("Failed to upgrade weak pointer (we dropped th value we are pointing to)")
+            .read()
+            .unwrap()
+            .value
+            .clone();
     }
 
 }
 
 impl<T: Eq> PartialEq for Connection<T> {
     fn eq(&self, other: &Self) -> bool {
-        return self.destination.read().unwrap().value.eq(&other.destination.read().unwrap().value);
+        return self.destination
+            .upgrade()
+            .unwrap()
+            .read()
+            .unwrap().value.eq(
+                &other.destination
+                    .upgrade()
+                    .unwrap()
+                    .read()
+                    .unwrap()
+                    .value
+            );
     }
 }
 
@@ -84,6 +102,6 @@ impl<T: Ord> Ord for Connection<T> {
 
 impl<T: Display> fmt::Display for Connection<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "Connection to {} with distance: {}", self.destination.read().unwrap().value, self.distance);
+        return write!(f, "Connection to {} with distance: {}", self.destination.upgrade().unwrap().read().unwrap().value, self.distance);
     }
 }
